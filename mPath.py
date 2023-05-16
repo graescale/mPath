@@ -88,11 +88,13 @@ class MotionObj:
         # Subtract 1 from the motion path U value and add 1 to the last U value.
         cmds.keyframe(motion_path_pm, edit=True, relative=True, valueChange=-1, index=(0,0))
         cmds.keyframe(motion_path_pm, edit=True, relative=True, valueChange=1, index=(1,1))
+        cmds.delete(parametric_mp_obj)
 
 
     def create_arc_length_dim(self):
         print('|create_arc_length_dim|')
         self.arc_len_dim = pm.arcLengthDimension(self.mp_curve + '.u[' + str(len(self.curve_pts)-3) + ']')
+        print('self.arc_len_dim is %s'% self.arc_len_dim)
         self.total_arc_len = cmds.getAttr(self.arc_len_dim + '.arcLength')
         cmds.setKeyframe(self.arc_len_dim +'.upv', time=(self.start_frame, self.end_frame))
         self.spline_curve(self.arc_len_dim +'.upv', 'u')
@@ -113,6 +115,9 @@ class MotionObj:
             #self.arc_len_values.append(arc_len_value)
             cmds.setKeyframe(self.motion_path, time=time, at='u', value=arc_len_value)
 
+    def delete_unused(self):
+        cmds.delete(self.arc_len_dim._name)
+
 
 #*******************************************************************************
 # RUN
@@ -124,4 +129,4 @@ motion_obj.create_curve()
 motion_obj.create_pm_motion_path()
 motion_obj.create_arc_length_dim()
 motion_obj.create_motion_path()
-
+motion_obj.delete_unused()
